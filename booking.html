@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediPrice — Book Appointment</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #0d7a6b;
+    --teal-light: #e8f5f2;
+    --teal-mid: #1a9b87;
+    --coral: #f26b4e;
+    --sand: #faf8f4;
+    --ink: #1a1a2e;
+    --ink-mid: #3d3d56;
+    --ink-light: #7a7a96;
+    --white: #ffffff;
+    --border: #e8e4dd;
+    --shadow: 0 2px 20px rgba(13,122,107,0.08);
+    --shadow-lg: 0 8px 40px rgba(13,122,107,0.14);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--sand);
+    color: var(--ink);
+  }
+
+  nav {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 50;
+  }
+
+  .nav-logo {
+    font-family: 'Fraunces', serif;
+    font-size: 20px; font-weight: 600;
+    color: var(--teal); text-decoration: none;
+  }
+
+  .nav-logo span { color: var(--coral); }
+
+  .nav-back {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 500; color: var(--ink-mid);
+    cursor: pointer; text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    transition: background 0.2s;
+  }
+
+  .nav-back:hover { background: var(--sand); color: var(--ink); }
+
+  .page-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 40px 80px;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 40px;
+    align-items: start;
+  }
+
+  /* LEFT: Provider + booking */
+  .provider-header {
+    background: white;
+    border-radius: 24px;
+    padding: 36px;
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+
+  .provider-top {
+    display: flex; gap: 20px; margin-bottom: 24px;
+  }
+
+  .provider-logo {
+    width: 72px; height: 72px;
+    background: var(--teal-light);
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; flex-shrink: 0;
+    border: 1px solid rgba(13,122,107,0.15);
+  }
+
+  .provider-title { flex: 1; }
+
+  .provider-name-big {
+    font-family: 'Fraunces', serif;
+    font-size: 26px; font-weight: 600; color: var(--ink);
+    letter-spacing: -0.5px; margin-bottom: 6px;
+  }
+
+  .provider-addr {
+    font-size: 14px; color: var(--ink-light);
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .rating-row {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 14px; color: var(--ink-mid);
+  }
+
+  .rating-stars { color: #f5a623; font-size: 15px; }
+  .rating-num { font-weight: 700; color: var(--ink); }
+  .rating-count { color: var(--ink-light); }
+
+  .badge-row {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-top: 12px;
+  }
+
+  .badge {
+    background: var(--teal-light);
+    color: var(--teal);
+    font-size: 12px; font-weight: 600;
+    padding: 5px 12px; border-radius: 8px;
+  }
+
+  .badge.neutral {
+    background: var(--sand);
+    color: var(--ink-mid);
+    border: 1px solid var(--border);
+  }
+
+  .price-highlight-row {
+    background: var(--teal-light);
+    border-radius: 16px;
+    padding: 20px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    border: 1px solid rgba(13,122,107,0.15);
+  }
+
+  .phi-left { }
+  .phi-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; color: var(--teal); margin-bottom: 4px; }
+  .phi-service { font-size: 16px; font-weight: 600; color: var(--ink); }
+
+  .phi-price {
+    text-align: right;
+  }
+
+  .phi-price-main {
+    font-family: 'Fraunces', serif;
+    font-size: 38px; font-weight: 600; color: var(--teal); line-height: 1;
+  }
+
+  .phi-price-compare {
+    font-size: 13px; color: var(--ink-light);
+  }
+
+  .phi-save {
+    display: inline-block;
+    background: var(--coral);
+    color: white; font-size: 12px; font-weight: 700;
+    padding: 4px 10px; border-radius: 100px;
+    margin-top: 4px;
+  }
+
+  /* CALENDAR */
+  .section-block {
+    background: white;
+    border-radius: 24px;
+    padding: 32px;
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+
+  .section-block h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 20px; font-weight: 600; color: var(--ink);
+    letter-spacing: -0.3px; margin-bottom: 20px;
+  }
+
+  .calendar-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .cal-month {
+    font-size: 16px; font-weight: 700; color: var(--ink);
+  }
+
+  .cal-arrow {
+    width: 32px; height: 32px; border-radius: 8px;
+    border: 1px solid var(--border); background: none;
+    cursor: pointer; font-size: 16px; color: var(--ink-mid);
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .cal-arrow:hover { background: var(--sand); }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .cal-day-header {
+    text-align: center; font-size: 11px; font-weight: 700;
+    color: var(--ink-light); text-transform: uppercase;
+    letter-spacing: 0.5px; padding: 4px 0 8px;
+  }
+
+  .cal-day {
+    text-align: center;
+    padding: 8px 4px;
+    border-radius: 10px;
+    font-size: 14px; font-weight: 500; color: var(--ink);
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .cal-day:hover:not(.disabled):not(.empty) { background: var(--teal-light); color: var(--teal); }
+  .cal-day.selected { background: var(--teal); color: white; }
+  .cal-day.today { font-weight: 700; }
+  .cal-day.today::after {
+    content: '';
+    position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
+    width: 4px; height: 4px; background: var(--teal); border-radius: 50%;
+  }
+  .cal-day.today.selected::after { background: white; }
+  .cal-day.disabled { color: var(--border); cursor: default; }
+  .cal-day.empty { cursor: default; }
+  .cal-day.has-slots::before {
+    content: '';
+    position: absolute; top: 3px; right: 4px;
+    width: 5px; height: 5px; background: var(--teal); border-radius: 50%;
+    opacity: 0.5;
+  }
+  .cal-day.selected::before { background: white; }
+
+  /* Time slots */
+  .time-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .time-slot {
+    padding: 12px 8px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    text-align: center;
+    font-size: 14px; font-weight: 600; color: var(--ink-mid);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .time-slot:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
+  .time-slot.selected { background: var(--teal); color: white; border-color: var(--teal); }
+  .time-slot.unavail { background: var(--sand); color: var(--border); cursor: default; border-color: transparent; }
+
+  .time-slot-sub { font-size: 11px; font-weight: 400; opacity: 0.7; margin-top: 2px; }
+
+  /* Info Tabs */
+  .tabs-row {
+    display: flex; gap: 0;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 24px;
+  }
+
+  .tab {
+    padding: 12px 20px;
+    font-size: 14px; font-weight: 600;
+    color: var(--ink-light); cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+  }
+
+  .tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+  .tab:hover:not(.active) { color: var(--ink-mid); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .info-row {
+    display: flex; gap: 12px; margin-bottom: 16px;
+    align-items: flex-start;
+  }
+
+  .info-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+  .info-text h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+  .info-text p { font-size: 13px; color: var(--ink-mid); line-height: 1.5; }
+
+  .insurance-list {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;
+  }
+
+  .ins-chip {
+    background: var(--sand); border: 1px solid var(--border);
+    font-size: 12px; padding: 5px 12px; border-radius: 8px; color: var(--ink-mid);
+    font-weight: 500;
+  }
+
+  /* REVIEW */
+  .review-card {
+    border: 1px solid var(--border); border-radius: 14px;
+    padding: 18px; margin-bottom: 12px;
+  }
+
+  .review-top { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .reviewer-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .review-date { font-size: 12px; color: var(--ink-light); }
+  .review-stars { color: #f5a623; font-size: 13px; margin-bottom: 8px; }
+  .review-text { font-size: 13px; color: var(--ink-mid); line-height: 1.6; }
+  .verified-badge { font-size: 11px; color: var(--teal); font-weight: 600; margin-top: 8px; }
+
+  /* RIGHT: Booking card */
+  .booking-card {
+    background: white;
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    padding: 28px;
+    position: sticky;
+    top: 84px;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .booking-card-title {
+    font-family: 'Fraunces', serif;
+    font-size: 20px; font-weight: 600; color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .booking-card-sub { font-size: 13px; color: var(--ink-light); margin-bottom: 20px; }
+
+  .selected-display {
+    background: var(--teal-light);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(13,122,107,0.15);
+  }
+
+  .sel-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; color: var(--teal); margin-bottom: 4px; }
+  .sel-value { font-size: 15px; font-weight: 600; color: var(--ink); }
+  .sel-empty { font-size: 14px; color: var(--ink-light); font-style: italic; }
+
+  .price-breakdown {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .price-row {
+    display: flex; justify-content: space-between;
+    padding: 12px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .price-row:last-child { border-bottom: none; }
+  .price-row.total { font-weight: 700; font-size: 15px; background: var(--sand); }
+  .price-row.total .price-label { color: var(--ink); }
+  .price-row.total .price-val { color: var(--teal); font-family: 'Fraunces', serif; font-size: 20px; }
+  .price-label { color: var(--ink-mid); }
+  .price-val { font-weight: 600; color: var(--ink); }
+  .price-val.save { color: var(--teal); }
+  .price-val.strikethrough { text-decoration: line-through; color: var(--ink-light); font-weight: 400; }
+
+  .guarantee-box {
+    background: var(--sand);
+    border-radius: 12px; padding: 14px;
+    display: flex; gap: 10px; align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .guarantee-icon { font-size: 20px; flex-shrink: 0; }
+  .guarantee-text { font-size: 12px; color: var(--ink-mid); line-height: 1.5; }
+  .guarantee-text strong { color: var(--ink); }
+
+  .book-cta {
+    width: 100%;
+    background: var(--teal); color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px; font-weight: 700;
+    padding: 18px;
+    border-radius: 16px; border: none; cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 12px;
+  }
+
+  .book-cta:hover { background: var(--teal-mid); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(13,122,107,0.3); }
+
+  .no-charge-notice { text-align: center; font-size: 12px; color: var(--ink-light); }
+
+  /* Map mini */
+  .mini-map {
+    width: 100%; height: 140px;
+    background: linear-gradient(135deg, #c8e6e0, #d8ede9);
+    border-radius: 16px;
+    margin-top: 20px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .mini-map-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+
+  .mini-map-label {
+    position: absolute; bottom: 10px; left: 12px;
+    background: white; border-radius: 8px; padding: 5px 10px;
+    font-size: 12px; font-weight: 600; color: var(--ink);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .mini-pin {
+    position: absolute; top: 38%; left: 52%;
+    transform: translate(-50%, -50%);
+    display: flex; flex-direction: column; align-items: center;
+  }
+
+  .mini-pin-bubble {
+    background: var(--teal); color: white;
+    font-size: 11px; font-weight: 700;
+    padding: 3px 8px; border-radius: 6px;
+  }
+
+  .mini-pin-stem { width: 2px; height: 6px; background: var(--teal); }
+  .mini-pin-dot { width: 6px; height: 6px; background: var(--teal); border-radius: 50%; }
+
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Medi<span>Price</span></a>
+  <a href="search.html" class="nav-back">← Back to results</a>
+  <div style="display:flex;gap:8px;">
+    <button style="background:none;border:1px solid var(--border);padding:8px 16px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;color:var(--ink-mid)">♡ Save</button>
+    <button style="background:none;border:1px solid var(--border);padding:8px 16px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;color:var(--ink-mid)">Share</button>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <!-- LEFT COLUMN -->
+  <div>
+    <!-- Provider Header -->
+    <div class="provider-header">
+      <div class="provider-top">
+        <div class="provider-logo">🏥</div>
+        <div class="provider-title">
+          <div class="provider-name-big">UCSF Radiology Center</div>
+          <div class="provider-addr">📍 1600 Divisadero St, San Francisco, CA · 0.4 mi away</div>
+          <div class="rating-row">
+            <span class="rating-stars">★★★★★</span>
+            <span class="rating-num">4.9</span>
+            <span class="rating-count">(312 reviews)</span>
+            <span style="color:var(--border)">·</span>
+            <span style="color:var(--teal);font-weight:600;font-size:13px;">Open now · Closes 6pm</span>
+          </div>
+          <div class="badge-row">
+            <span class="badge">✓ Price Verified</span>
+            <span class="badge">HIPAA Secure</span>
+            <span class="badge neutral">Accepts 14 insurance plans</span>
+            <span class="badge neutral">Board Certified Radiologists</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="price-highlight-row">
+        <div class="phi-left">
+          <div class="phi-label">Quoted Price for</div>
+          <div class="phi-service">MRI Scan — Brain, No Contrast (CPT 70553)</div>
+        </div>
+        <div class="phi-price">
+          <div class="phi-price-main">$195</div>
+          <div class="phi-price-compare">Avg. market price: $680</div>
+          <span class="phi-save">You save $485 (71%)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="section-block">
+      <h3>Select a Date</h3>
+      <div class="calendar-nav">
+        <button class="cal-arrow">‹</button>
+        <span class="cal-month">March 2026</span>
+        <button class="cal-arrow">›</button>
+      </div>
+      <div class="cal-grid">
+        <div class="cal-day-header">Su</div>
+        <div class="cal-day-header">Mo</div>
+        <div class="cal-day-header">Tu</div>
+        <div class="cal-day-header">We</div>
+        <div class="cal-day-header">Th</div>
+        <div class="cal-day-header">Fr</div>
+        <div class="cal-day-header">Sa</div>
+
+        <!-- Row 1 -->
+        <div class="cal-day empty"></div>
+        <div class="cal-day empty"></div>
+        <div class="cal-day empty"></div>
+        <div class="cal-day empty"></div>
+        <div class="cal-day empty"></div>
+        <div class="cal-day empty"></div>
+        <div class="cal-day has-slots" onclick="selectDay(this)">1</div>
+        <!-- Row 2 -->
+        <div class="cal-day has-slots" onclick="selectDay(this)">2</div>
+        <div class="cal-day has-slots today" onclick="selectDay(this)">3</div>
+        <div class="cal-day has-slots" onclick="selectDay(this)">4</div>
+        <div class="cal-day has-slots" onclick="selectDay(this)">5</div>
+        <div class="cal-day has-slots" onclick="selectDay(this)">6</div>
+        <div class="cal-day has-slots" onclick="selectDay(this)">7</div>
+        <div class="cal-day" onclick="selectDay(this)">8</div>
+        <!-- Row 3 -->
+        <div class="cal-day" onclick="selectDay(this)">9</div>
+        <div class="cal-day selected has-slots" id="day10" onclick="selectDay(this)">10</div>
+        <div class="cal-day has-slots" onclick="selectDay(this)">11</div>
+        <div class="cal-day has-slots" onclick="selectDay(this)">12</div>
+        <div class="cal-day has-slots" onclick="selectDay(this)">13</div>
+        <div class="cal-day" onclick="selectDay(this)">14</div>
+        <div class="cal-day" onclick="selectDay(this)">15</div>
+        <!-- Row 4 -->
+        <div class="cal-day has-slots" onclick="selectDay(this)">16</div>
+        <div class="cal-day has-slots" onclick="selectDay(this)">17</div>
+        <div class="cal-day has-slots" onclick="selectDay(this)">18</div>
+        <div class="cal-day has-slots" onclick="selectDay(this)">19</div>
+        <div class="cal-day has-slots" onclick="selectDay(this)">20</div>
+        <div class="cal-day disabled">21</div>
+        <div class="cal-day disabled">22</div>
+        <!-- Row 5 -->
+        <div class="cal-day has-slots" onclick="selectDay(this)">23</div>
+        <div class="cal-day has-slots" onclick="selectDay(this)">24</div>
+        <div class="cal-day has-slots" onclick="selectDay(this)">25</div>
+        <div class="cal-day has-slots" onclick="selectDay(this)">26</div>
+        <div class="cal-day has-slots" onclick="selectDay(this)">27</div>
+        <div class="cal-day" onclick="selectDay(this)">28</div>
+        <div class="cal-day" onclick="selectDay(this)">29</div>
+        <div class="cal-day has-slots" onclick="selectDay(this)">30</div>
+        <div class="cal-day has-slots" onclick="selectDay(this)">31</div>
+      </div>
+    </div>
+
+    <!-- Time Slots -->
+    <div class="section-block">
+      <h3>Available Times — Monday, March 10</h3>
+      <div style="font-size:13px;color:var(--ink-light);margin-bottom:16px;">All times are in Pacific Time (PT)</div>
+      <div class="time-slots-grid">
+        <div class="time-slot unavail">8:00 AM<div class="time-slot-sub">Booked</div></div>
+        <div class="time-slot" onclick="selectTime(this)">8:30 AM<div class="time-slot-sub">Available</div></div>
+        <div class="time-slot unavail">9:00 AM<div class="time-slot-sub">Booked</div></div>
+        <div class="time-slot" onclick="selectTime(this)">9:30 AM<div class="time-slot-sub">Available</div></div>
+        <div class="time-slot selected" onclick="selectTime(this)">10:00 AM<div class="time-slot-sub">Available</div></div>
+        <div class="time-slot" onclick="selectTime(this)">10:30 AM<div class="time-slot-sub">Available</div></div>
+        <div class="time-slot unavail">11:00 AM<div class="time-slot-sub">Booked</div></div>
+        <div class="time-slot" onclick="selectTime(this)">11:30 AM<div class="time-slot-sub">Available</div></div>
+        <div class="time-slot unavail">1:00 PM<div class="time-slot-sub">Booked</div></div>
+        <div class="time-slot" onclick="selectTime(this)">1:30 PM<div class="time-slot-sub">Available</div></div>
+        <div class="time-slot" onclick="selectTime(this)">2:00 PM<div class="time-slot-sub">Available</div></div>
+        <div class="time-slot unavail">2:30 PM<div class="time-slot-sub">Booked</div></div>
+      </div>
+    </div>
+
+    <!-- Info Tabs -->
+    <div class="section-block">
+      <div class="tabs-row">
+        <div class="tab active" onclick="switchTab(this,'overview')">Overview</div>
+        <div class="tab" onclick="switchTab(this,'insurance')">Insurance</div>
+        <div class="tab" onclick="switchTab(this,'reviews')">Reviews (312)</div>
+        <div class="tab" onclick="switchTab(this,'faq')">FAQ</div>
+      </div>
+
+      <div class="tab-content active" id="tab-overview">
+        <div class="info-row">
+          <div class="info-icon">🕐</div>
+          <div class="info-text">
+            <h4>Duration</h4>
+            <p>Your MRI Brain scan typically takes 25–35 minutes. Please arrive 15 minutes early to complete paperwork and prepare for the procedure.</p>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon">📋</div>
+          <div class="info-text">
+            <h4>What to bring</h4>
+            <p>Valid photo ID, insurance card (if applicable), referral or prescription from your doctor. Avoid wearing metal jewelry or accessories.</p>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon">🔒</div>
+          <div class="info-text">
+            <h4>Price Guarantee</h4>
+            <p>The price you see is the price you pay — $195. This is guaranteed by MediPrice. If you're charged more, we'll cover the difference.</p>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon">📍</div>
+          <div class="info-text">
+            <h4>Location & Parking</h4>
+            <p>1600 Divisadero St, SF. Free parking available in the adjacent garage (enter from Geary). MUNI: 24-Divisadero stops out front.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-insurance">
+        <p style="font-size:14px;color:var(--ink-mid);margin-bottom:16px;">UCSF Radiology Center accepts the following insurance plans. You can also pay out-of-pocket at the quoted price of $195.</p>
+        <div class="insurance-list">
+          <span class="ins-chip">Aetna</span>
+          <span class="ins-chip">Blue Shield CA</span>
+          <span class="ins-chip">Cigna</span>
+          <span class="ins-chip">United Healthcare</span>
+          <span class="ins-chip">Humana</span>
+          <span class="ins-chip">Medicare</span>
+          <span class="ins-chip">Medi-Cal</span>
+          <span class="ins-chip">Anthem BCBS</span>
+          <span class="ins-chip">Oscar Health</span>
+          <span class="ins-chip">Sutter Health Plus</span>
+          <span class="ins-chip">Health Net</span>
+          <span class="ins-chip">Covered CA</span>
+          <span class="ins-chip">TRICARE</span>
+          <span class="ins-chip">Molina Healthcare</span>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-reviews">
+        <div class="review-card">
+          <div class="review-top">
+            <div class="reviewer-name">Sarah K.</div>
+            <div class="review-date">Feb 2026</div>
+          </div>
+          <div class="review-stars">★★★★★</div>
+          <div class="review-text">I was so relieved to find this on MediPrice. The same scan was quoted at $980 at CPMC. Showed up, waited maybe 5 min, and it was exactly $195 on my bill. Will be using this app for everything from now on.</div>
+          <div class="verified-badge">✓ Verified Booking via MediPrice</div>
+        </div>
+        <div class="review-card">
+          <div class="review-top">
+            <div class="reviewer-name">James T.</div>
+            <div class="review-date">Jan 2026</div>
+          </div>
+          <div class="review-stars">★★★★★</div>
+          <div class="review-text">Staff was super professional. Scheduling through MediPrice was seamless — no phone calls, just picked a time and showed up. The radiologist even sent my results within 24 hours.</div>
+          <div class="verified-badge">✓ Verified Booking via MediPrice</div>
+        </div>
+        <div class="review-card">
+          <div class="review-top">
+            <div class="reviewer-name">Maria L.</div>
+            <div class="review-date">Dec 2025</div>
+          </div>
+          <div class="review-stars">★★★★☆</div>
+          <div class="review-text">Great value and clean facility. Only hiccup was parking — the garage was full and I had to circle once. But the scan itself went smoothly and the price matched exactly.</div>
+          <div class="verified-badge">✓ Verified Booking via MediPrice</div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-faq">
+        <div class="info-row">
+          <div class="info-icon">❓</div>
+          <div class="info-text">
+            <h4>Do I need a doctor's referral?</h4>
+            <p>In California, a physician order or referral is required for MRI scans. We can help connect you with a telehealth provider for same-day referrals if needed.</p>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon">❓</div>
+          <div class="info-text">
+            <h4>What if I need to reschedule?</h4>
+            <p>You can reschedule or cancel for free up to 24 hours before your appointment. No cancellation fees.</p>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon">❓</div>
+          <div class="info-text">
+            <h4>Is $195 the final price?</h4>
+            <p>Yes. MediPrice guarantees the quoted price. The $195 is your full out-of-pocket cost unless your insurance covers part of it, in which case it may be lower.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN: Booking Card -->
+  <div>
+    <div class="booking-card">
+      <div class="booking-card-title">Confirm Booking</div>
+      <div class="booking-card-sub">MRI Brain · UCSF Radiology Center</div>
+
+      <div class="selected-display">
+        <div class="sel-label">📅 Selected Date & Time</div>
+        <div class="sel-value" id="selectedDateTime">Mon, March 10 · 10:00 AM</div>
+      </div>
+
+      <div class="price-breakdown">
+        <div class="price-row">
+          <span class="price-label">Service price</span>
+          <span class="price-val">$195.00</span>
+        </div>
+        <div class="price-row">
+          <span class="price-label">MediPrice fee</span>
+          <span class="price-val save">Free</span>
+        </div>
+        <div class="price-row">
+          <span class="price-label">Market average</span>
+          <span class="price-val strikethrough">$680</span>
+        </div>
+        <div class="price-row total">
+          <span class="price-label">Your total</span>
+          <span class="price-val">$195</span>
+        </div>
+      </div>
+
+      <div class="guarantee-box">
+        <div class="guarantee-icon">🛡️</div>
+        <div class="guarantee-text">
+          <strong>MediPrice Price Guarantee.</strong> The price you see is the price you pay. If you're ever billed more, we cover the difference — no questions asked.
+        </div>
+      </div>
+
+      <button class="book-cta" onclick="window.location='confirmation.html'">Reserve Appointment →</button>
+      <div class="no-charge-notice">No charge until your appointment. Free cancellation up to 24h before.</div>
+
+      <div class="mini-map">
+        <div class="mini-map-grid"></div>
+        <div class="mini-pin">
+          <div class="mini-pin-bubble">UCSF Radiology</div>
+          <div class="mini-pin-stem"></div>
+          <div class="mini-pin-dot"></div>
+        </div>
+        <div class="mini-map-label">📍 1600 Divisadero St · Get directions</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function selectDay(el) {
+    if (el.classList.contains('disabled') || el.classList.contains('empty')) return;
+    document.querySelectorAll('.cal-day').forEach(d => d.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function selectTime(el) {
+    if (el.classList.contains('unavail')) return;
+    document.querySelectorAll('.time-slot').forEach(t => t.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function switchTab(el, tabId) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tab-' + tabId).classList.add('active');
+  }
+</script>
+
+</body>
+</html>

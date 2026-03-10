@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediPrice — Booking Confirmed!</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #0d7a6b;
+    --teal-light: #e8f5f2;
+    --coral: #f26b4e;
+    --sand: #faf8f4;
+    --ink: #1a1a2e;
+    --ink-mid: #3d3d56;
+    --ink-light: #7a7a96;
+    --border: #e8e4dd;
+    --shadow-lg: 0 8px 40px rgba(13,122,107,0.14);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: linear-gradient(160deg, #e8f5f2 0%, #faf8f4 40%);
+    min-height: 100vh;
+    color: var(--ink);
+  }
+
+  nav {
+    padding: 0 40px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'Fraunces', serif;
+    font-size: 20px; font-weight: 600;
+    color: var(--teal); text-decoration: none;
+  }
+
+  .nav-logo span { color: var(--coral); }
+
+  .page-center {
+    max-width: 680px; margin: 0 auto;
+    padding: 60px 40px 100px;
+  }
+
+  /* SUCCESS HEADER */
+  .success-header {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: popIn 0.6s ease-out forwards;
+    opacity: 0;
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .confetti-circle {
+    width: 88px; height: 88px;
+    background: var(--teal);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px; margin: 0 auto 24px;
+    box-shadow: 0 0 0 12px rgba(13,122,107,0.12), 0 0 0 24px rgba(13,122,107,0.05);
+    animation: pulseRing 2s ease-out 0.5s;
+  }
+
+  @keyframes pulseRing {
+    0% { box-shadow: 0 0 0 0 rgba(13,122,107,0.5); }
+    70% { box-shadow: 0 0 0 30px rgba(13,122,107,0); }
+    100% { box-shadow: 0 0 0 0 rgba(13,122,107,0); }
+  }
+
+  .success-label {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 2px;
+    font-weight: 700; color: var(--teal); margin-bottom: 10px;
+  }
+
+  .success-title {
+    font-family: 'Fraunces', serif;
+    font-size: 40px; font-weight: 600; color: var(--ink);
+    letter-spacing: -1px; line-height: 1.2; margin-bottom: 12px;
+  }
+
+  .success-sub {
+    font-size: 16px; color: var(--ink-mid); line-height: 1.6;
+  }
+
+  /* CONFIRMATION CARD */
+  .conf-card {
+    background: white;
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-lg);
+    animation: popIn 0.6s ease-out 0.2s forwards;
+    opacity: 0;
+  }
+
+  .conf-card-header {
+    background: var(--teal);
+    padding: 24px 28px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  .conf-id {
+    font-size: 12px; color: rgba(255,255,255,0.7);
+    font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .conf-id-num {
+    font-family: 'Fraunces', serif;
+    font-size: 22px; color: white; font-weight: 600; letter-spacing: -0.5px;
+  }
+
+  .conf-qr {
+    width: 64px; height: 64px;
+    background: white;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: var(--ink-light); text-align: center;
+    padding: 4px;
+    line-height: 1.3;
+  }
+
+  /* QR code pattern */
+  .qr-inner {
+    width: 100%; height: 100%;
+    background:
+      repeating-linear-gradient(0deg, #1a1a2e 0px, #1a1a2e 3px, transparent 3px, transparent 6px),
+      repeating-linear-gradient(90deg, #1a1a2e 0px, #1a1a2e 3px, transparent 3px, transparent 6px);
+    opacity: 0.15;
+    border-radius: 4px;
+  }
+
+  .conf-details {
+    padding: 28px;
+  }
+
+  .conf-row {
+    display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start;
+  }
+
+  .conf-row:last-child { margin-bottom: 0; }
+
+  .conf-icon {
+    width: 40px; height: 40px; flex-shrink: 0;
+    background: var(--teal-light); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .conf-info { flex: 1; }
+  .conf-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; color: var(--ink-light); margin-bottom: 3px; }
+  .conf-value { font-size: 15px; font-weight: 600; color: var(--ink); }
+  .conf-value-sub { font-size: 13px; color: var(--ink-mid); margin-top: 1px; }
+
+  .conf-divider { height: 1px; background: var(--border); margin: 0 28px; }
+
+  /* SAVINGS CALLOUT */
+  .savings-callout {
+    background: linear-gradient(135deg, var(--teal), #1a9b87);
+    border-radius: 20px;
+    padding: 28px 32px;
+    color: white;
+    text-align: center;
+    margin-bottom: 24px;
+    position: relative; overflow: hidden;
+    animation: popIn 0.6s ease-out 0.4s forwards;
+    opacity: 0;
+  }
+
+  .savings-callout::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1), transparent 50%);
+  }
+
+  .savings-amount {
+    font-family: 'Fraunces', serif;
+    font-size: 56px; font-weight: 700; line-height: 1;
+    margin-bottom: 6px;
+    position: relative;
+  }
+
+  .savings-label {
+    font-size: 15px; color: rgba(255,255,255,0.85);
+    font-weight: 500; margin-bottom: 16px;
+    position: relative;
+  }
+
+  .savings-compare {
+    display: inline-flex; gap: 12px; align-items: center;
+    background: rgba(255,255,255,0.15); border-radius: 100px;
+    padding: 8px 20px; font-size: 14px; font-weight: 600;
+    position: relative;
+  }
+
+  .savings-compare .strikethrough { text-decoration: line-through; opacity: 0.6; }
+
+  /* NEXT STEPS */
+  .next-steps {
+    background: white;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    padding: 28px;
+    margin-bottom: 24px;
+    animation: popIn 0.6s ease-out 0.6s forwards;
+    opacity: 0;
+  }
+
+  .next-steps h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 18px; font-weight: 600; color: var(--ink);
+    margin-bottom: 20px;
+  }
+
+  .next-step-item {
+    display: flex; gap: 14px; margin-bottom: 16px; align-items: flex-start;
+  }
+
+  .next-step-item:last-child { margin-bottom: 0; }
+
+  .step-bullet {
+    width: 28px; height: 28px; flex-shrink: 0;
+    background: var(--teal); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: white;
+  }
+
+  .step-text h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+  .step-text p { font-size: 13px; color: var(--ink-mid); line-height: 1.5; }
+
+  /* CTA ROW */
+  .cta-row {
+    display: flex; gap: 12px;
+    animation: popIn 0.6s ease-out 0.8s forwards;
+    opacity: 0;
+  }
+
+  .btn-primary-full {
+    flex: 2; padding: 16px;
+    background: var(--teal); color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 700;
+    border-radius: 14px; border: none; cursor: pointer;
+    transition: all 0.2s;
+    text-align: center; text-decoration: none;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+
+  .btn-primary-full:hover { background: #1a9b87; transform: translateY(-1px); }
+
+  .btn-outline-full {
+    flex: 1; padding: 16px;
+    border: 1.5px solid var(--border); background: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 600;
+    border-radius: 14px; cursor: pointer;
+    color: var(--ink-mid); transition: all 0.2s;
+  }
+
+  .btn-outline-full:hover { border-color: var(--teal); color: var(--teal); }
+
+  /* SHARE */
+  .share-row {
+    text-align: center;
+    padding: 20px 0 0;
+    animation: popIn 0.6s ease-out 1.0s forwards;
+    opacity: 0;
+  }
+
+  .share-label { font-size: 13px; color: var(--ink-light); margin-bottom: 12px; }
+
+  .share-btns { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+
+  .share-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--border); border-radius: 100px;
+    background: white; font-size: 13px; cursor: pointer;
+    color: var(--ink-mid); font-family: 'DM Sans', sans-serif;
+    font-weight: 500; transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .share-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
+
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Medi<span>Price</span></a>
+  <a href="index.html" style="font-size:14px;color:var(--ink-mid);text-decoration:none;font-weight:500;">← Back to Home</a>
+</nav>
+
+<div class="page-center">
+
+  <!-- SUCCESS HEADER -->
+  <div class="success-header">
+    <div class="confetti-circle">✓</div>
+    <div class="success-label">Appointment Confirmed</div>
+    <h1 class="success-title">You're all set,<br><em style="font-style:italic;color:var(--teal)">and you saved $485.</em></h1>
+    <p class="success-sub">Your booking is confirmed. A confirmation email has been sent to you with all the details.</p>
+  </div>
+
+  <!-- CONFIRMATION CARD -->
+  <div class="conf-card">
+    <div class="conf-card-header">
+      <div>
+        <div class="conf-id">Booking Reference</div>
+        <div class="conf-id-num">MP-2026-38491</div>
+      </div>
+      <div class="conf-qr">
+        <div class="qr-inner"></div>
+      </div>
+    </div>
+
+    <div class="conf-details">
+      <div class="conf-row">
+        <div class="conf-icon">🏥</div>
+        <div class="conf-info">
+          <div class="conf-label">Provider</div>
+          <div class="conf-value">UCSF Radiology Center</div>
+          <div class="conf-value-sub">1600 Divisadero St, San Francisco, CA 94115</div>
+        </div>
+      </div>
+
+      <div class="conf-divider"></div>
+      <div style="height: 20px;"></div>
+
+      <div class="conf-row">
+        <div class="conf-icon">🔬</div>
+        <div class="conf-info">
+          <div class="conf-label">Service</div>
+          <div class="conf-value">MRI Brain — No Contrast</div>
+          <div class="conf-value-sub">CPT Code 70553 · Est. 25–35 min</div>
+        </div>
+      </div>
+
+      <div class="conf-row">
+        <div class="conf-icon">📅</div>
+        <div class="conf-info">
+          <div class="conf-label">Date & Time</div>
+          <div class="conf-value">Monday, March 10, 2026</div>
+          <div class="conf-value-sub">10:00 AM Pacific Time</div>
+        </div>
+      </div>
+
+      <div class="conf-row">
+        <div class="conf-icon">💰</div>
+        <div class="conf-info">
+          <div class="conf-label">Your Price (Guaranteed)</div>
+          <div class="conf-value" style="color:var(--teal);font-size:22px;font-family:'Fraunces',serif;">$195.00</div>
+          <div class="conf-value-sub">No payment due until appointment</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAVINGS CALLOUT -->
+  <div class="savings-callout">
+    <div class="savings-amount">$485</div>
+    <div class="savings-label">saved compared to the average market price</div>
+    <div class="savings-compare">
+      <span class="strikethrough">$680 elsewhere</span>
+      <span>→</span>
+      <span style="font-size:16px;">$195 with MediPrice</span>
+    </div>
+  </div>
+
+  <!-- NEXT STEPS -->
+  <div class="next-steps">
+    <h3>What to do next</h3>
+    <div class="next-step-item">
+      <div class="step-bullet">1</div>
+      <div class="step-text">
+        <h4>Check your email</h4>
+        <p>A full confirmation with prep instructions and your appointment details has been sent to your email address.</p>
+      </div>
+    </div>
+    <div class="next-step-item">
+      <div class="step-bullet">2</div>
+      <div class="step-text">
+        <h4>Bring your referral</h4>
+        <p>Make sure you have a physician referral or prescription for the MRI. Don't have one? <a href="#" style="color:var(--teal);font-weight:600;">Get a telehealth referral →</a></p>
+      </div>
+    </div>
+    <div class="next-step-item">
+      <div class="step-bullet">3</div>
+      <div class="step-text">
+        <h4>Arrive 15 min early</h4>
+        <p>Please arrive at 9:45 AM to complete any remaining paperwork and prepare for your scan. No metal jewelry or accessories.</p>
+      </div>
+    </div>
+    <div class="next-step-item">
+      <div class="step-bullet">4</div>
+      <div class="step-text">
+        <h4>Pay at checkout</h4>
+        <p>Pay the guaranteed $195 directly at the provider on the day of your visit. We guarantee this price in writing.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA ROW -->
+  <div class="cta-row">
+    <button class="btn-primary-full">
+      📅 Add to Calendar
+    </button>
+    <button class="btn-outline-full">📲 View in App</button>
+    <button class="btn-outline-full">Manage Booking</button>
+  </div>
+
+  <!-- SHARE -->
+  <div class="share-row">
+    <div class="share-label">Know someone who overpays for healthcare? Share MediPrice:</div>
+    <div class="share-btns">
+      <button class="share-btn">📧 Email a Friend</button>
+      <button class="share-btn">🐦 Share on X</button>
+      <button class="share-btn">💬 WhatsApp</button>
+      <button class="share-btn">📋 Copy Link</button>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

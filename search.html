@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediPrice — Search Results</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #0d7a6b;
+    --teal-light: #e8f5f2;
+    --teal-mid: #1a9b87;
+    --coral: #f26b4e;
+    --sand: #faf8f4;
+    --ink: #1a1a2e;
+    --ink-mid: #3d3d56;
+    --ink-light: #7a7a96;
+    --white: #ffffff;
+    --border: #e8e4dd;
+    --shadow: 0 2px 20px rgba(13,122,107,0.08);
+    --shadow-lg: 0 8px 40px rgba(13,122,107,0.14);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--sand);
+    color: var(--ink);
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* NAV */
+  nav {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 64px;
+    display: flex; align-items: center; gap: 20px;
+    flex-shrink: 0;
+    z-index: 100;
+  }
+
+  .nav-logo {
+    font-family: 'Fraunces', serif;
+    font-size: 20px; font-weight: 600;
+    color: var(--teal); text-decoration: none;
+    letter-spacing: -0.5px; white-space: nowrap;
+  }
+
+  .nav-logo span { color: var(--coral); }
+
+  .search-bar-wrap {
+    flex: 1; display: flex; gap: 0;
+    background: var(--sand);
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    overflow: hidden;
+    max-width: 680px;
+    transition: border-color 0.2s;
+  }
+
+  .search-bar-wrap:focus-within { border-color: var(--teal); }
+
+  .search-input {
+    flex: 1; padding: 10px 16px;
+    border: none; background: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; color: var(--ink); outline: none;
+  }
+
+  .search-divider {
+    width: 1px; background: var(--border); margin: 8px 0;
+  }
+
+  .search-btn-sm {
+    background: var(--teal); color: white;
+    border: none; cursor: pointer;
+    padding: 0 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 600;
+    display: flex; align-items: center; gap: 6px;
+    transition: background 0.2s;
+  }
+
+  .search-btn-sm:hover { background: var(--teal-mid); }
+
+  .nav-filters {
+    display: flex; gap: 8px; align-items: center;
+    flex-shrink: 0;
+  }
+
+  .filter-btn {
+    padding: 7px 14px;
+    border: 1px solid var(--border);
+    background: white; border-radius: 100px;
+    font-size: 13px; font-weight: 500;
+    color: var(--ink-mid); cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    transition: all 0.2s; white-space: nowrap;
+  }
+
+  .filter-btn:hover { border-color: var(--teal); color: var(--teal); }
+  .filter-btn.active { background: var(--teal); color: white; border-color: var(--teal); }
+
+  /* MAIN LAYOUT */
+  .main-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* LEFT PANEL */
+  .left-panel {
+    width: 440px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    background: white;
+    border-right: 1px solid var(--border);
+  }
+
+  .left-panel::-webkit-scrollbar { width: 4px; }
+  .left-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .results-header {
+    padding: 20px 20px 0;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0;
+    background: white; z-index: 10;
+    padding-bottom: 16px;
+  }
+
+  .results-count {
+    font-size: 13px; color: var(--ink-light);
+    margin-bottom: 4px;
+  }
+
+  .results-title {
+    font-family: 'Fraunces', serif;
+    font-size: 22px; font-weight: 600;
+    color: var(--ink); letter-spacing: -0.5px;
+  }
+
+  .sort-row {
+    display: flex; gap: 8px; margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .sort-chip {
+    padding: 5px 12px;
+    border-radius: 100px; border: 1px solid var(--border);
+    font-size: 12px; font-weight: 500; cursor: pointer;
+    color: var(--ink-mid);
+    transition: all 0.2s;
+  }
+
+  .sort-chip.active { background: var(--ink); color: white; border-color: var(--ink); }
+  .sort-chip:hover:not(.active) { border-color: var(--teal); color: var(--teal); }
+
+  /* RESULT CARDS */
+  .result-list { padding: 12px; }
+
+  .result-card {
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    background: white;
+    transition: all 0.22s;
+    position: relative;
+  }
+
+  .result-card:hover { border-color: var(--teal); box-shadow: var(--shadow); transform: translateY(-1px); }
+  .result-card.selected { border-color: var(--teal); background: var(--teal-light); }
+
+  .card-top { display: flex; gap: 14px; align-items: flex-start; }
+
+  .provider-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; flex-shrink: 0;
+    background: var(--sand);
+    border: 1px solid var(--border);
+  }
+
+  .provider-info { flex: 1; }
+
+  .provider-name {
+    font-size: 15px; font-weight: 600; color: var(--ink);
+    margin-bottom: 3px;
+  }
+
+  .provider-meta {
+    font-size: 12px; color: var(--ink-light);
+    display: flex; gap: 8px; align-items: center;
+  }
+
+  .meta-dot { width: 3px; height: 3px; background: var(--border); border-radius: 50%; }
+
+  .rating {
+    display: flex; align-items: center; gap: 3px;
+    font-size: 12px; color: var(--ink-mid); font-weight: 500;
+  }
+
+  .stars { color: #f5a623; font-size: 11px; }
+
+  .price-block { text-align: right; flex-shrink: 0; }
+
+  .price-main {
+    font-family: 'Fraunces', serif;
+    font-size: 26px; font-weight: 600;
+    color: var(--teal); line-height: 1;
+  }
+
+  .price-compare {
+    font-size: 11px; color: var(--ink-light);
+    text-decoration: line-through; margin-top: 2px;
+  }
+
+  .price-save {
+    font-size: 11px; color: var(--coral); font-weight: 700;
+    margin-top: 1px;
+  }
+
+  .card-divider { height: 1px; background: var(--border); margin: 14px 0; }
+
+  .card-bottom {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  .card-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .tag-sm {
+    background: var(--sand);
+    border: 1px solid var(--border);
+    font-size: 11px; color: var(--ink-mid);
+    padding: 3px 8px; border-radius: 6px; font-weight: 500;
+  }
+
+  .tag-sm.green { background: var(--teal-light); border-color: var(--teal); color: var(--teal); }
+
+  .book-btn-sm {
+    background: var(--teal); color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 600;
+    padding: 9px 18px; border-radius: 10px;
+    border: none; cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .book-btn-sm:hover { background: var(--teal-mid); }
+
+  .best-value-badge {
+    position: absolute; top: -10px; left: 18px;
+    background: var(--coral); color: white;
+    font-size: 11px; font-weight: 700;
+    padding: 4px 10px; border-radius: 100px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  /* MAP PANEL */
+  .map-panel {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .map-bg {
+    position: absolute; inset: 0;
+    background: #e4efe8;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px);
+    background-size: 52px 52px;
+  }
+
+  .map-road-h {
+    position: absolute;
+    background: rgba(255,255,255,0.75);
+    left: 0; right: 0;
+  }
+
+  .map-road-v {
+    position: absolute;
+    background: rgba(255,255,255,0.75);
+    top: 0; bottom: 0;
+  }
+
+  /* Park blobs */
+  .map-park {
+    position: absolute;
+    background: #b8d8be;
+    border-radius: 50%;
+    opacity: 0.6;
+  }
+
+  .map-block {
+    position: absolute;
+    background: rgba(255,255,255,0.4);
+    border-radius: 4px;
+  }
+
+  .map-pin {
+    position: absolute;
+    display: flex; flex-direction: column; align-items: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: transform 0.2s;
+  }
+
+  .map-pin:hover { transform: scale(1.1); z-index: 20; }
+
+  .pin-bubble {
+    background: white;
+    border-radius: 10px;
+    padding: 5px 11px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 700;
+    color: var(--ink);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.18);
+    white-space: nowrap;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .pin-bubble.active {
+    background: var(--teal); color: white;
+    border-color: var(--teal);
+    transform: scale(1.12);
+  }
+
+  .pin-bubble.highlighted {
+    background: var(--coral); color: white;
+    border-color: var(--coral);
+    transform: scale(1.1);
+  }
+
+  .pin-stem {
+    width: 2px; height: 8px;
+    background: var(--teal);
+    margin-top: -1px;
+  }
+
+  .pin-bubble.active ~ .pin-stem, .pin-bubble.highlighted ~ .pin-stem { background: var(--coral); }
+
+  .pin-dot-base {
+    width: 8px; height: 8px;
+    background: var(--teal);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(13,122,107,0.2);
+  }
+
+  .map-controls {
+    position: absolute;
+    right: 16px; top: 50%;
+    transform: translateY(-50%);
+    display: flex; flex-direction: column; gap: 4px;
+    z-index: 20;
+  }
+
+  .map-ctrl-btn {
+    width: 36px; height: 36px;
+    background: white; border: 1px solid var(--border);
+    border-radius: 8px; cursor: pointer;
+    font-size: 18px; font-weight: 600;
+    color: var(--ink); display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: background 0.2s;
+  }
+
+  .map-ctrl-btn:hover { background: var(--sand); }
+
+  /* DETAIL POPUP */
+  .map-detail-popup {
+    position: absolute;
+    bottom: 24px; left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+    width: 380px;
+    z-index: 30;
+    display: none;
+    animation: popIn 0.3s ease-out;
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+
+  .map-detail-popup.show { display: block; }
+
+  .popup-top { display: flex; gap: 14px; margin-bottom: 16px; }
+
+  .popup-icon {
+    width: 56px; height: 56px;
+    background: var(--teal-light);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; flex-shrink: 0;
+  }
+
+  .popup-info { flex: 1; }
+  .popup-name { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .popup-sub { font-size: 13px; color: var(--ink-light); }
+
+  .popup-price {
+    font-family: 'Fraunces', serif;
+    font-size: 28px; font-weight: 600; color: var(--teal);
+    text-align: right;
+  }
+
+  .popup-price-sub { font-size: 11px; color: var(--ink-light); text-align: right; }
+
+  .popup-stats {
+    display: flex; gap: 0;
+    border: 1px solid var(--border); border-radius: 12px;
+    overflow: hidden; margin-bottom: 16px;
+  }
+
+  .popup-stat {
+    flex: 1; padding: 10px; text-align: center;
+    border-right: 1px solid var(--border);
+  }
+
+  .popup-stat:last-child { border-right: none; }
+
+  .popup-stat-num { font-size: 15px; font-weight: 700; color: var(--ink); }
+  .popup-stat-label { font-size: 11px; color: var(--ink-light); margin-top: 2px; }
+
+  .popup-actions { display: flex; gap: 10px; }
+
+  .btn-outline-sm {
+    flex: 1; padding: 12px;
+    border: 1.5px solid var(--border); background: none;
+    border-radius: 12px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--ink-mid);
+    transition: all 0.2s;
+  }
+
+  .btn-outline-sm:hover { border-color: var(--teal); color: var(--teal); }
+
+  .btn-book-popup {
+    flex: 2; padding: 12px;
+    background: var(--teal); color: white;
+    border: none; border-radius: 12px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 700;
+    transition: background 0.2s;
+    text-decoration: none;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .btn-book-popup:hover { background: var(--teal-mid); }
+
+  .popup-close {
+    position: absolute; top: 14px; right: 16px;
+    width: 28px; height: 28px;
+    background: var(--sand); border: none; cursor: pointer;
+    border-radius: 50%; font-size: 16px; color: var(--ink-light);
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .popup-close:hover { background: var(--border); }
+
+  /* Map legend */
+  .map-legend {
+    position: absolute;
+    top: 16px; left: 16px;
+    background: white; border-radius: 12px;
+    padding: 12px 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    z-index: 20;
+    font-size: 12px;
+  }
+
+  .legend-title { font-weight: 700; color: var(--ink); margin-bottom: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+
+  .legend-item { display: flex; align-items: center; gap: 8px; color: var(--ink-mid); margin-bottom: 6px; }
+  .legend-item:last-child { margin-bottom: 0; }
+
+  .legend-dot {
+    width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0;
+  }
+
+  .map-filter-row {
+    position: absolute;
+    top: 16px; right: 60px;
+    display: flex; gap: 8px;
+    z-index: 20;
+  }
+
+  .map-filter-chip {
+    background: white; border: 1px solid var(--border);
+    border-radius: 100px; padding: 7px 14px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    color: var(--ink-mid); transition: all 0.2s;
+  }
+
+  .map-filter-chip:hover { border-color: var(--teal); color: var(--teal); }
+  .map-filter-chip.active { background: var(--teal); color: white; border-color: var(--teal); }
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">Medi<span>Price</span></a>
+
+  <div class="search-bar-wrap">
+    <input class="search-input" type="text" value="MRI Scan (Brain, No Contrast)" placeholder="Service...">
+    <div class="search-divider"></div>
+    <input class="search-input" type="text" value="San Francisco, CA" placeholder="Location..." style="max-width: 170px;">
+    <button class="search-btn-sm">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Search
+    </button>
+  </div>
+
+  <div class="nav-filters">
+    <button class="filter-btn">Insurance <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:2px"><path d="m6 9 6 6 6-6"/></svg></button>
+    <button class="filter-btn active">Lowest Price</button>
+    <button class="filter-btn">Distance</button>
+    <button class="filter-btn">Rating <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:2px"><path d="m6 9 6 6 6-6"/></svg></button>
+    <button class="filter-btn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+      Filters
+    </button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main-layout">
+
+  <!-- LEFT PANEL: Results -->
+  <div class="left-panel">
+    <div class="results-header">
+      <div class="results-count">18 providers found near San Francisco</div>
+      <div class="results-title">MRI Scan — Brain</div>
+      <div class="sort-row">
+        <span class="sort-chip active">Best Value</span>
+        <span class="sort-chip">Price: Low</span>
+        <span class="sort-chip">Distance</span>
+        <span class="sort-chip">Top Rated</span>
+        <span class="sort-chip">Fastest Appt.</span>
+      </div>
+    </div>
+
+    <div class="result-list">
+
+      <!-- Card 1 - Best Value -->
+      <div class="result-card selected" onclick="showPopup()" id="card1">
+        <div class="best-value-badge">🏆 Best Value</div>
+        <div class="card-top">
+          <div class="provider-icon">🏥</div>
+          <div class="provider-info">
+            <div class="provider-name">UCSF Radiology Center</div>
+            <div class="provider-meta">
+              <span>0.4 mi</span>
+              <span class="meta-dot"></span>
+              <span>Mission District</span>
+              <span class="meta-dot"></span>
+              <span class="rating"><span class="stars">★★★★★</span> 4.9 (312)</span>
+            </div>
+          </div>
+          <div class="price-block">
+            <div class="price-main">$195</div>
+            <div class="price-compare">Avg $680</div>
+            <div class="price-save">Save $485</div>
+          </div>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-bottom">
+          <div class="card-tags">
+            <span class="tag-sm green">✓ Price Verified</span>
+            <span class="tag-sm">Next: Tomorrow</span>
+            <span class="tag-sm">Accepts Aetna</span>
+          </div>
+          <a class="book-btn-sm" href="booking.html">Book →</a>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="result-card" onclick="selectCard(this)">
+        <div class="card-top">
+          <div class="provider-icon">🏨</div>
+          <div class="provider-info">
+            <div class="provider-name">SF General Imaging</div>
+            <div class="provider-meta">
+              <span>0.9 mi</span>
+              <span class="meta-dot"></span>
+              <span>Potrero Hill</span>
+              <span class="meta-dot"></span>
+              <span class="rating"><span class="stars">★★★★☆</span> 4.6 (188)</span>
+            </div>
+          </div>
+          <div class="price-block">
+            <div class="price-main">$210</div>
+            <div class="price-compare">Avg $680</div>
+            <div class="price-save">Save $470</div>
+          </div>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-bottom">
+          <div class="card-tags">
+            <span class="tag-sm green">✓ Price Verified</span>
+            <span class="tag-sm">Next: Today 3pm</span>
+            <span class="tag-sm">Most Insurances</span>
+          </div>
+          <a class="book-btn-sm" href="booking.html">Book →</a>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="result-card" onclick="selectCard(this)">
+        <div class="card-top">
+          <div class="provider-icon">🔬</div>
+          <div class="provider-info">
+            <div class="provider-name">Bay Area Open MRI</div>
+            <div class="provider-meta">
+              <span>1.2 mi</span>
+              <span class="meta-dot"></span>
+              <span>SoMa</span>
+              <span class="meta-dot"></span>
+              <span class="rating"><span class="stars">★★★★★</span> 4.8 (94)</span>
+            </div>
+          </div>
+          <div class="price-block">
+            <div class="price-main">$240</div>
+            <div class="price-compare">Avg $680</div>
+            <div class="price-save">Save $440</div>
+          </div>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-bottom">
+          <div class="card-tags">
+            <span class="tag-sm green">✓ Price Verified</span>
+            <span class="tag-sm">Next: Tomorrow</span>
+            <span class="tag-sm">Open MRI</span>
+          </div>
+          <a class="book-btn-sm" href="booking.html">Book →</a>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="result-card" onclick="selectCard(this)">
+        <div class="card-top">
+          <div class="provider-icon">🏛️</div>
+          <div class="provider-info">
+            <div class="provider-name">Sutter Health Imaging</div>
+            <div class="provider-meta">
+              <span>1.8 mi</span>
+              <span class="meta-dot"></span>
+              <span>Castro</span>
+              <span class="meta-dot"></span>
+              <span class="rating"><span class="stars">★★★★☆</span> 4.5 (420)</span>
+            </div>
+          </div>
+          <div class="price-block">
+            <div class="price-main">$280</div>
+            <div class="price-compare">Avg $680</div>
+            <div class="price-save">Save $400</div>
+          </div>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-bottom">
+          <div class="card-tags">
+            <span class="tag-sm green">✓ Price Verified</span>
+            <span class="tag-sm">Next: Thu</span>
+            <span class="tag-sm">Large network</span>
+          </div>
+          <a class="book-btn-sm" href="booking.html">Book →</a>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="result-card" onclick="selectCard(this)">
+        <div class="card-top">
+          <div class="provider-icon">🏥</div>
+          <div class="provider-info">
+            <div class="provider-name">Kaiser Permanente - SF</div>
+            <div class="provider-meta">
+              <span>2.1 mi</span>
+              <span class="meta-dot"></span>
+              <span>Geary Blvd</span>
+              <span class="meta-dot"></span>
+              <span class="rating"><span class="stars">★★★★☆</span> 4.3 (1,240)</span>
+            </div>
+          </div>
+          <div class="price-block">
+            <div class="price-main">$310</div>
+            <div class="price-compare">Avg $680</div>
+            <div class="price-save">Save $370</div>
+          </div>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-bottom">
+          <div class="card-tags">
+            <span class="tag-sm green">✓ Price Verified</span>
+            <span class="tag-sm">Next: Fri</span>
+            <span class="tag-sm">Kaiser Members</span>
+          </div>
+          <a class="book-btn-sm" href="booking.html">Book →</a>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="result-card" onclick="selectCard(this)">
+        <div class="card-top">
+          <div class="provider-icon">🏨</div>
+          <div class="provider-info">
+            <div class="provider-name">Pacific Medical Centers</div>
+            <div class="provider-meta">
+              <span>2.6 mi</span>
+              <span class="meta-dot"></span>
+              <span>Richmond</span>
+              <span class="meta-dot"></span>
+              <span class="rating"><span class="stars">★★★★☆</span> 4.4 (267)</span>
+            </div>
+          </div>
+          <div class="price-block">
+            <div class="price-main">$340</div>
+            <div class="price-compare">Avg $680</div>
+            <div class="price-save">Save $340</div>
+          </div>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-bottom">
+          <div class="card-tags">
+            <span class="tag-sm green">✓ Price Verified</span>
+            <span class="tag-sm">Next: Mon</span>
+            <span class="tag-sm">Bilingual</span>
+          </div>
+          <a class="book-btn-sm" href="booking.html">Book →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MAP PANEL -->
+  <div class="map-panel" id="mapPanel">
+    <div class="map-bg"></div>
+
+    <!-- Roads -->
+    <div class="map-road-h" style="top: 20%; height: 10px;"></div>
+    <div class="map-road-h" style="top: 40%; height: 8px;"></div>
+    <div class="map-road-h" style="top: 60%; height: 6px;"></div>
+    <div class="map-road-h" style="top: 75%; height: 8px;"></div>
+    <div class="map-road-h" style="top: 85%; height: 5px;"></div>
+    <div class="map-road-v" style="left: 15%; width: 8px;"></div>
+    <div class="map-road-v" style="left: 35%; width: 6px;"></div>
+    <div class="map-road-v" style="left: 55%; width: 9px;"></div>
+    <div class="map-road-v" style="left: 72%; width: 6px;"></div>
+    <div class="map-road-v" style="left: 85%; width: 5px;"></div>
+
+    <!-- Parks -->
+    <div class="map-park" style="width:140px;height:100px; top:28%;left:40%;"></div>
+    <div class="map-park" style="width:80px;height:80px; top:55%;left:68%;"></div>
+
+    <!-- Blocks -->
+    <div class="map-block" style="width:60px;height:50px; top:10%;left:20%;"></div>
+    <div class="map-block" style="width:80px;height:55px; top:25%;left:60%;"></div>
+    <div class="map-block" style="width:55px;height:40px; top:65%;left:25%;"></div>
+    <div class="map-block" style="width:70px;height:50px; top:70%;left:50%;"></div>
+
+    <!-- Pins -->
+    <div class="map-pin" style="top: 22%; left: 48%;" onclick="showPopup()">
+      <div class="pin-bubble active">$195</div>
+      <div class="pin-stem"></div>
+      <div class="pin-dot-base"></div>
+    </div>
+    <div class="map-pin" style="top: 35%; left: 62%;" onclick="showPopup()">
+      <div class="pin-bubble">$210</div>
+      <div class="pin-stem" style="background:var(--teal)"></div>
+      <div class="pin-dot-base"></div>
+    </div>
+    <div class="map-pin" style="top: 50%; left: 30%;" onclick="showPopup()">
+      <div class="pin-bubble">$240</div>
+      <div class="pin-stem" style="background:var(--teal)"></div>
+      <div class="pin-dot-base"></div>
+    </div>
+    <div class="map-pin" style="top: 45%; left: 72%;" onclick="showPopup()">
+      <div class="pin-bubble">$280</div>
+      <div class="pin-stem" style="background:var(--teal)"></div>
+      <div class="pin-dot-base"></div>
+    </div>
+    <div class="map-pin" style="top: 65%; left: 55%;" onclick="showPopup()">
+      <div class="pin-bubble">$310</div>
+      <div class="pin-stem" style="background:var(--teal)"></div>
+      <div class="pin-dot-base"></div>
+    </div>
+    <div class="map-pin" style="top: 30%; left: 20%;" onclick="showPopup()">
+      <div class="pin-bubble">$340</div>
+      <div class="pin-stem" style="background:var(--teal)"></div>
+      <div class="pin-dot-base"></div>
+    </div>
+
+    <!-- User location -->
+    <div style="position:absolute; top:42%; left:50%; transform:translate(-50%,-50%); z-index:15;">
+      <div style="width:16px;height:16px;background:white;border-radius:50%;border:3px solid var(--teal);box-shadow:0 0 0 6px rgba(13,122,107,0.2);"></div>
+    </div>
+
+    <!-- Map Legend -->
+    <div class="map-legend">
+      <div class="legend-title">Price Range</div>
+      <div class="legend-item"><div class="legend-dot" style="background: var(--teal);"></div> $100–$250</div>
+      <div class="legend-item"><div class="legend-dot" style="background: #f5a623;"></div> $250–$400</div>
+      <div class="legend-item"><div class="legend-dot" style="background: var(--coral);"></div> $400+</div>
+      <div class="legend-item" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+        <div style="width:12px;height:12px;border-radius:50%;border:2px solid var(--teal);"></div> You are here
+      </div>
+    </div>
+
+    <!-- Map filter row -->
+    <div class="map-filter-row">
+      <div class="map-filter-chip active">All Providers</div>
+      <div class="map-filter-chip">Accepting Insurance</div>
+      <div class="map-filter-chip">Open Today</div>
+      <div class="map-filter-chip">Top Rated</div>
+    </div>
+
+    <!-- Zoom controls -->
+    <div class="map-controls">
+      <button class="map-ctrl-btn">+</button>
+      <button class="map-ctrl-btn">−</button>
+    </div>
+
+    <!-- Popup -->
+    <div class="map-detail-popup show" id="detailPopup">
+      <button class="popup-close" onclick="closePopup()">✕</button>
+      <div class="popup-top">
+        <div class="popup-icon">🏥</div>
+        <div class="popup-info">
+          <div class="popup-name">UCSF Radiology Center</div>
+          <div class="popup-sub">MRI Brain · No contrast · Mission District</div>
+        </div>
+        <div>
+          <div class="popup-price">$195</div>
+          <div class="popup-price-sub">vs avg $680</div>
+        </div>
+      </div>
+
+      <div class="popup-stats">
+        <div class="popup-stat">
+          <div class="popup-stat-num">0.4 mi</div>
+          <div class="popup-stat-label">Distance</div>
+        </div>
+        <div class="popup-stat">
+          <div class="popup-stat-num">4.9 ★</div>
+          <div class="popup-stat-label">Rating</div>
+        </div>
+        <div class="popup-stat">
+          <div class="popup-stat-num">Tomorrow</div>
+          <div class="popup-stat-label">Next appt.</div>
+        </div>
+        <div class="popup-stat">
+          <div class="popup-stat-num">25 min</div>
+          <div class="popup-stat-label">Duration</div>
+        </div>
+      </div>
+
+      <div class="popup-actions">
+        <button class="btn-outline-sm">Details</button>
+        <a class="btn-book-popup" href="booking.html">Book Appointment →</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function selectCard(el) {
+    document.querySelectorAll('.result-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    showPopup();
+  }
+
+  function showPopup() {
+    document.getElementById('detailPopup').classList.add('show');
+  }
+
+  function closePopup() {
+    document.getElementById('detailPopup').classList.remove('show');
+  }
+
+  document.querySelectorAll('.sort-chip').forEach(c => {
+    c.addEventListener('click', function() {
+      document.querySelectorAll('.sort-chip').forEach(x => x.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.filter-btn').forEach(c => {
+    c.addEventListener('click', function() {
+      this.classList.toggle('active');
+    });
+  });
+
+  document.querySelectorAll('.map-filter-chip').forEach(c => {
+    c.addEventListener('click', function() {
+      document.querySelectorAll('.map-filter-chip').forEach(x => x.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
